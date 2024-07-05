@@ -1,0 +1,35 @@
+@import "../constants";
+
+.transactions {
+  border: 1px solid $primary-border-color;
+  border-radius: 6px;
+  margin-top: 32px;
+  padding: 16px;
+
+  label {
+    display: flex;
+    font-weight: $font-bold;
+    justify-content: space-between;
+
+    svg {
+      color: $primary;
+      cursor: pointer;
+    }
+  }
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  border-bottom: 1px solid $border-color;
+  padding: 16px 0;
+
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+}

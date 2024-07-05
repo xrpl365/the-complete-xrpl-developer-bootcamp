@@ -1,0 +1,12 @@
+@import "../constants";
+
+.toast-container {
+  width: 480px;
+
+  .toast {
+    background-color: $success;
+    color: $white;
+    margin: 10px;
+    width: 460px;
+  }
+}

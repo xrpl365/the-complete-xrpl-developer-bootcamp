@@ -1,0 +1,36 @@
+@import "../constants";
+
+.manage-accounts {
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      align-items: center;
+      border-bottom: 1px solid $border-color;
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+
+      &:first-child {
+        border-top: 1px solid $border-color;
+      }
+    }
+
+    .buttons-container {
+      display: flex;
+      gap: 16px;
+
+      button {
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+}
