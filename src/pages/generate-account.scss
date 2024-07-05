@@ -1,0 +1,15 @@
+@import "../constants";
+
+.generate-account {
+  .account-container {
+    margin-bottom: 16px;
+
+    label {
+      font-weight: 600;
+    }
+
+    > div {
+      margin-bottom: 16px;
+    }
+  }
+}
