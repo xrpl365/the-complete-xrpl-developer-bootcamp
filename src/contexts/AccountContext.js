@@ -9,6 +9,7 @@ export const AccountProvider = ({ children }) => {
   const [accounts, setAccounts] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState();
   const [balance, setBalance] = useState();
+  const [transactions, setTransactions] = useState([]);
   const [reserve, setReserve] = useState();
 
   const _getBalance = useCallback(async (account) => {
@@ -32,6 +33,56 @@ export const AccountProvider = ({ children }) => {
         setBalance(); // Set balance to undefined - account doesn't exist
       } finally {
         client.disconnect();
+      }
+    }
+  }, []);
+
+  const _getTransactions = useCallback(async (account) => {
+    if (account) {
+      // Create client connection
+      const client = new Client(process.env.REACT_APP_NETWORK);
+      await client.connect();
+
+      try {
+        const allTransactions = await client.request({
+          command: "account_tx",
+          account: account.address,
+          ledger_index_min: -1, // Optional - Use to specify the earliest ledger to include transactions from. -1 = earliest validated ledger.
+          ledger_index_max: -1, // Optional - Use to specify the newest ledger to include transactions from. -1 = newest validated ledger.
+          limit: 20, // Optional - limit the number of transactions to receive.
+          forward: false, // Optional - Returns the transactions with the oldest ledger first when set to true
+        });
+
+        // Filter the transactions - we only care about payments in XRP.
+        const filteredTransactions = allTransactions.result.transactions
+          .filter((transaction) => {
+            // Filter for Payment transactions only.
+            if (transaction.tx.TransactionType !== "Payment") return false;
+
+            // Filter for only XRP payments.
+            return typeof transaction.tx.Amount === "string";
+          })
+          .map((transaction) => {
+            return {
+              account: transaction.tx.Account,
+              destination: transaction.tx.Destination,
+              hash: transaction.tx.hash,
+              direction: transaction.tx.Account === account.address ? "Sent" : "Received",
+              date: new Date((transaction.tx.date + 946684800) * 1000),
+              transactionResult: transaction.meta.TransactionResult,
+              amount:
+                transaction.meta.TransactionResult === "tesSUCCESS"
+                  ? dropsToXrp(transaction.meta?.delivered_amount)
+                  : 0,
+            };
+          });
+
+        setTransactions(filteredTransactions);
+      } catch (error) {
+        console.log(error);
+        setTransactions([]);
+      } finally {
+        await client.disconnect();
       }
     }
   }, []);
@@ -71,10 +122,15 @@ export const AccountProvider = ({ children }) => {
 
   useEffect(() => {
     _getBalance(selectedWallet);
-  }, [selectedWallet, _getBalance]);
+    _getTransactions(selectedWallet);
+  }, [selectedWallet, _getBalance, _getTransactions]);
 
   const refreshBalance = () => {
     _getBalance(selectedWallet);
+  };
+
+  const refreshTransactions = () => {
+    _getTransactions(selectedWallet);
   };
 
   const selectWallet = (account) => {
@@ -114,8 +170,10 @@ export const AccountProvider = ({ children }) => {
         removeAccount,
         selectWallet,
         balance,
+        transactions,
         reserve,
         refreshBalance,
+        refreshTransactions,
       }}
     >
       {children}

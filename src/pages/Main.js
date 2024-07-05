@@ -1,3 +1,5 @@
+import Transactions from "../components/Transactions";
+
 import Balance from "../components/Balance";
 
 import "./main.scss";
@@ -9,7 +11,9 @@ function Main() {
       <section className="balance-container">
         <Balance />
       </section>
-      <section className="transactions-container"></section>
+      <section className="transactions-container">
+        <Transactions />
+      </section>
     </div>
   );
 }
