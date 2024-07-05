@@ -1,2 +1,1 @@
-# the-complete-xrpl-developer-bootcamp
-Resource files for the Udemy course - The Complete XRPL Developer Bootcamp
+# Udemy Resources: The Complete XRP Ledger Developer Bootcamp
