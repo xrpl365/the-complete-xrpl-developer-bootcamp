@@ -1,0 +1,29 @@
+@import "../constants";
+
+.balance {
+  background-color: $primary-bg;
+  border: 1px solid $primary-border-color;
+  border-radius: 6px;
+  padding: 16px;
+
+  label {
+    display: flex;
+    font-weight: $font-bold;
+    justify-content: space-between;
+
+    svg {
+      color: $primary;
+      cursor: pointer;
+    }
+  }
+
+  .amount {
+    font-size: 32px;
+  }
+
+  .reserve {
+    color: $dark-grey;
+    font-size: 12px;
+    text-align: right;
+  }
+}
