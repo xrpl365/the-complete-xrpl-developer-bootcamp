@@ -1,11 +1,13 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { Client, dropsToXrp, Wallet, xrpToDrops } from "xrpl";
+import { ToastManager } from "../components/Toast";
 
 // Create a context
 const AccountContext = createContext();
 
 // Provider component
 export const AccountProvider = ({ children }) => {
+  const client = useRef();
   const [accounts, setAccounts] = useState([]);
   const [selectedWallet, setSelectedWallet] = useState();
   const [balance, setBalance] = useState();
@@ -121,8 +123,59 @@ export const AccountProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    // Open a web socket to listen for transactions
+    // This web socket will be created once and re-used
+    if (!client.current) {
+      client.current = new Client(process.env.REACT_APP_NETWORK);
+    }
+    const onTransaction = async (event) => {
+      if (event.meta.TransactionResult === "tesSUCCESS") {
+        if (event.transaction.Account === selectedWallet.address) {
+          // Sent
+          ToastManager.addToast(`Successfully sent ${dropsToXrp(event.transaction.Amount)} XRP`);
+        } else if (event.transaction.Destination === selectedWallet.address) {
+          ToastManager.addToast(
+            `Successfully received ${dropsToXrp(event.transaction.Amount)} XRP`
+          );
+        }
+      } else {
+        //Handle the failed transaction
+        ToastManager.addToast("Failed");
+      }
+      _getBalance(selectedWallet);
+      _getTransactions(selectedWallet);
+    };
+
+    const listenToWallet = async () => {
+      try {
+        if (!client.current.isConnected()) await client.current.connect();
+        client.current.on("transaction", onTransaction);
+
+        await client.current.request({
+          command: "subscribe",
+          accounts: [selectedWallet?.address],
+        });
+      } catch (error) {
+        console.error(error);
+      } // Note we don;t close the connection
+    };
+
+    selectedWallet && listenToWallet();
     _getBalance(selectedWallet);
     _getTransactions(selectedWallet);
+
+    return () => {
+      // Clean-up if there is a previous connection open
+      if (client.current.isConnected()) {
+        (async () => {
+          client.current.removeListener("transaction", onTransaction);
+          await client.current.request({
+            command: "unsubscribe",
+            accounts: [selectedWallet.address],
+          });
+        })();
+      }
+    };
   }, [selectedWallet, _getBalance, _getTransactions]);
 
   const refreshBalance = () => {
@@ -217,6 +270,7 @@ export const AccountProvider = ({ children }) => {
         refreshBalance,
         refreshTransactions,
         sendXRP,
+        selectedWallet,
       }}
     >
       {children}
