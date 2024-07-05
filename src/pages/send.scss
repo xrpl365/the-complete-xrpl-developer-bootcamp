@@ -1,0 +1,15 @@
+@import "../constants";
+
+.send {
+  .form-group {
+    margin-bottom: 16px;
+
+    label {
+      margin: 0;
+    }
+  }
+
+  button {
+    margin-top: 8px;
+  }
+}

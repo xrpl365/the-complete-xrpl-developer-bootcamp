@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { Client, dropsToXrp } from "xrpl";
+import { Client, dropsToXrp, Wallet, xrpToDrops } from "xrpl";
 
 // Create a context
 const AccountContext = createContext();
@@ -162,6 +162,48 @@ export const AccountProvider = ({ children }) => {
     });
   };
 
+  const sendXRP = async (amount, destination, destinationTag) => {
+    if (!selectedWallet) throw new Error("No wallet selected");
+
+    // Get wallet from seed
+    const wallet = Wallet.fromSeed(selectedWallet.seed);
+
+    // New ledger connection
+    const client = new Client(process.env.REACT_APP_NETWORK);
+    await client.connect();
+
+    try {
+      // Create payment object
+      const payment = {
+        TransactionType: "Payment",
+        Account: wallet.classicAddress,
+        Amount: xrpToDrops(amount),
+        Destination: destination,
+      };
+
+      if (destinationTag) {
+        payment.DestinationTag = parseInt(destinationTag);
+      }
+
+      // Prepare transaction
+      const prepared = await client.autofill(payment);
+
+      // Sign the transaction
+      const signed = wallet.sign(prepared);
+
+      // Submit transaction and wait before running into finally block
+      await client.submitAndWait(signed.tx_blob);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await client.disconnect();
+
+      // Update the selectedWallet balance and transactions state
+      refreshBalance(selectedWallet);
+      refreshTransactions(selectedWallet);
+    }
+  };
+
   return (
     <AccountContext.Provider
       value={{
@@ -174,6 +216,7 @@ export const AccountProvider = ({ children }) => {
         reserve,
         refreshBalance,
         refreshTransactions,
+        sendXRP,
       }}
     >
       {children}
