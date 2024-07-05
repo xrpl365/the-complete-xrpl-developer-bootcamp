@@ -1,0 +1,31 @@
+@import "../constants";
+
+header {
+  align-items: center;
+  background-color: $primary;
+  color: $white;
+  display: flex;
+  height: 72px;
+  justify-content: space-between;
+  padding: 16px;
+
+  .header-logo {
+    cursor: pointer;
+    padding: 8px;
+
+    svg {
+      font-size: 24px;
+    }
+
+    .project-name {
+      font-size: 24px;
+      line-height: 1;
+      margin-left: 16px;
+    }
+  }
+
+  .header-settings {
+    cursor: pointer;
+    padding: 8px;
+  }
+}

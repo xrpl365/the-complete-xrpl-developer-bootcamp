@@ -41,6 +41,7 @@
     "eslint-plugin-react": "^7.34.1",
     "globals": "^15.0.0",
     "stylelint": "^16.3.1",
+    "stylelint-config-sass-guidelines": "^11.1.0",
     "stylelint-config-standard-scss": "^13.1.0",
     "stylelint-order": "^6.0.4",
     "stylelint-scss": "^6.2.1"

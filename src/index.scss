@@ -13,8 +13,8 @@
   color: $white;
 }
 
-.btn-primary:not(:disabled):not(.disabled).active,
-.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled) :not(.disabled).active,
+.btn-primary:not(:disabled) :not(.disabled):active,
 .btn-primary,
 .btn-primary:hover {
   background-color: $primary;
@@ -40,6 +40,17 @@ body {
   margin: 0 auto;
   max-width: 480px;
   padding: 0;
+}
+
+main {
+  height: calc(100vh - 122px); /* Adjusts to the remaining height */
+  overflow-y: auto;
+  padding: 24px;
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 h1 {

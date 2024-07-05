@@ -1,5 +1,17 @@
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Main from "./pages/Main";
+
 function App() {
-  return <div className="App">XRPL Wallet v1.0</div>;
+  return (
+    <>
+      <Header />
+      <main>
+        <Main />
+      </main>
+      <Footer />
+    </>
+  );
 }
 
 export default App;
